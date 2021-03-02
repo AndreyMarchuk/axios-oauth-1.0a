@@ -43,7 +43,7 @@ addOAuthInterceptor(client, {
 
 build the package
 
-`npm install -g typescript`
-`npm i --save-dev @types/node`
-`cd axios-oauth-1.0a`
+`npm install -g typescript` \\
+`npm i --save-dev @types/node` \\
+`cd axios-oauth-1.0a` \\
 `npm run build`
