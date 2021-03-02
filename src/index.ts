@@ -47,6 +47,16 @@ export interface OAuthInterceptorConfig {
   includeBodyHash?: boolean | "auto";
 
   /**
+   * Include the OAuth params into url
+   */
+  includeIntoURL?: boolean | false;
+
+  /**
+   * OAuth callback param (optional)
+   */
+  callback?: string | null;
+
+  /**
    * Consumer key
    */
   key: string;
@@ -70,6 +80,8 @@ const addOAuthInterceptor = (
     algorithm = "HMAC-SHA256",
     token = null,
     includeBodyHash = "auto",
+    includeIntoURL = false,
+    callback = null,
   }: OAuthInterceptorConfig
 ) => {
   client.interceptors.request.use((config: AxiosRequestConfig) => {
@@ -81,6 +93,10 @@ const addOAuthInterceptor = (
       oauth_timestamp: String(Math.floor(Date.now() * 0.001)),
       oauth_version: "1.0",
     };
+
+    if (callback) {
+      oauthParams.oauth_callback = callback;
+    }
 
     const oauthUrl = new URL(
       !config.baseURL || isAbsoluteURL(config.url)
@@ -146,6 +162,12 @@ const addOAuthInterceptor = (
         .map((e) => [e[0], '="', rfc3986(e[1]), '"'].join(""))
         .join(","),
     ].join(" ");
+
+    if (includeIntoURL) {
+      config.url += "?" + Object.entries(oauthParams)
+        .map((e) => [e[0], '=', rfc3986(e[1]), ''].join(""))
+        .join("&")
+    }
 
     return {
       ...config,
